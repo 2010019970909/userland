@@ -54,7 +54,7 @@ jobs:
         env:
           # VALIDATE_ALL_CODEBASE: false
           # ACTIONS_RUNNER_DEBUG: true
-          # FILTER_REGEX_INCLUDE: .*test/.*, .*old/.*, .*reports/.*
+          FILTER_REGEX_INCLUDE: (./host_applications/linux/apps/raspicam/raspiMJPEG*.*|./host_applications/linux/apps/raspicam/RaspiM*.*|./host_applications/linux/apps/raspicam/README*Raspi*.md)
           FILTER_REGEX_EXCLUDE: (./src/*|.vscode/*)
           VALIDATE_JSCPD: false
           # VALIDATE_JSON: true
