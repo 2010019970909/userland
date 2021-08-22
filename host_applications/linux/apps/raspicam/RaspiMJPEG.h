@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <time.h>
 #include <unistd.h>
 
-#include "bcm_host.h"
+#include "bcm_host.h"  // NOLINT
 #include "interface/mmal/mmal.h"
 #include "interface/mmal/mmal_buffer.h"
 #include "interface/mmal/mmal_logging.h"
@@ -233,7 +233,7 @@ void mmalLog(char *msg, ...);
 void printLogEx(int logfile, char *msg, ...);
 void printLog(char *msg, ...);
 void updateStatus();
-void error(const char *string, char fatal);
+void error(const char *error_string, char fatal);
 int findNextCount(char *folder, char *source);
 char *trim(char *s);
 void makeName(char **name, char *template);

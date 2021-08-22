@@ -579,7 +579,7 @@ void start_video(unsigned char prepare_buf) {
                     copy_from_start = 0;
                     copy_from_end = cb_wptr - iframe_buff[iframe_buff_rpos];
                 }
-                long fileSizeCircularBuffer =
+                int32_t fileSizeCircularBuffer =
                     copy_from_start + copy_from_end + header_wptr;
                 fseek(h264output_file, fileSizeCircularBuffer, SEEK_SET);
             }
@@ -733,8 +733,8 @@ void cam_stop_buffering() {
 void cam_set_buffer() {
     cam_stop_buffering();
     if (cfg_val[c_video_buffer] != 0) {
-        int count = ((long long)cfg_val[c_video_bitrate] / 8 *
-                     (long long)cfg_val[c_video_buffer]) /
+        int count = ((int64_t)cfg_val[c_video_bitrate] / 8 *
+                     (int64_t)cfg_val[c_video_buffer]) /
                     1000;
 
         cb_buff = reinterpret_cast<char *>(malloc(count));
@@ -753,9 +753,9 @@ void cam_set_ip(int std) {
     int ip = STD_INTRAPERIOD;
 
     if (!std) {
-        ip = ((long long)cfg_val[c_video_buffer] *
-              (long long)cfg_val[c_video_fps]) /
-             4000;
+        ip =
+            ((int64_t)cfg_val[c_video_buffer] * (int64_t)cfg_val[c_video_fps]) /
+            4000;
         if (ip > STD_INTRAPERIOD) ip = STD_INTRAPERIOD;
     }
 
@@ -767,31 +767,31 @@ void cam_set_ip(int std) {
 
 void cam_set_em() {
     MMAL_PARAM_EXPOSUREMODE_T mode;
-    if (strcmp(cfg_stru[c_exposure_mode], "off") == 0)
+    if (strcmp(cfg_stru[c_exposure_mode], "off") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_OFF;
-    else if (strcmp(cfg_stru[c_exposure_mode], "auto") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "auto") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_AUTO;
-    else if (strcmp(cfg_stru[c_exposure_mode], "night") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "night") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_NIGHT;
-    else if (strcmp(cfg_stru[c_exposure_mode], "nightpreview") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "nightpreview") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_NIGHTPREVIEW;
-    else if (strcmp(cfg_stru[c_exposure_mode], "backlight") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "backlight") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_BACKLIGHT;
-    else if (strcmp(cfg_stru[c_exposure_mode], "spotlight") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "spotlight") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_SPOTLIGHT;
-    else if (strcmp(cfg_stru[c_exposure_mode], "sports") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "sports") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_SPORTS;
-    else if (strcmp(cfg_stru[c_exposure_mode], "snow") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "snow") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_SNOW;
-    else if (strcmp(cfg_stru[c_exposure_mode], "beach") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "beach") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_BEACH;
-    else if (strcmp(cfg_stru[c_exposure_mode], "verylong") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "verylong") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_VERYLONG;
-    else if (strcmp(cfg_stru[c_exposure_mode], "fixedfps") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "fixedfps") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_FIXEDFPS;
-    else if (strcmp(cfg_stru[c_exposure_mode], "antishake") == 0)
+    } else if (strcmp(cfg_stru[c_exposure_mode], "antishake") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_ANTISHAKE;
-    else if (strcmp(cfg_stru[c_exposure_mode], "fireworks") == 0) {
+    } else if (strcmp(cfg_stru[c_exposure_mode], "fireworks") == 0) {
         mode = MMAL_PARAM_EXPOSUREMODE_FIREWORKS;
     } else {
         error("Invalid exposure mode", 1);
@@ -805,29 +805,29 @@ void cam_set_em() {
 
 void cam_set_wb() {
     MMAL_PARAM_AWBMODE_T awb_mode;
-    if (strcmp(cfg_stru[c_white_balance], "off") == 0)
+    if (strcmp(cfg_stru[c_white_balance], "off") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_OFF;
-    else if (strcmp(cfg_stru[c_white_balance], "auto") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "auto") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_AUTO;
-    else if (strcmp(cfg_stru[c_white_balance], "sun") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "sun") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_SUNLIGHT;
-    else if (strcmp(cfg_stru[c_white_balance], "cloudy") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "cloudy") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_CLOUDY;
-    else if (strcmp(cfg_stru[c_white_balance], "shade") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "shade") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_SHADE;
-    else if (strcmp(cfg_stru[c_white_balance], "tungsten") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "tungsten") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_TUNGSTEN;
-    else if (strcmp(cfg_stru[c_white_balance], "fluorescent") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "fluorescent") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_FLUORESCENT;
-    else if (strcmp(cfg_stru[c_white_balance], "incandescent") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "incandescent") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_INCANDESCENT;
-    else if (strcmp(cfg_stru[c_white_balance], "flash") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "flash") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_FLASH;
-    else if (strcmp(cfg_stru[c_white_balance], "horizon") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "horizon") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_HORIZON;
-    else if (strcmp(cfg_stru[c_white_balance], "greyworld") == 0)
+    } else if (strcmp(cfg_stru[c_white_balance], "greyworld") == 0) {
         awb_mode = MMAL_PARAM_AWBMODE_GREYWORLD;
-    else {
+    } else {
         error("Invalid white balance", 0);
         return;
     }
@@ -839,15 +839,15 @@ void cam_set_wb() {
 
 void cam_set_mm() {
     MMAL_PARAM_EXPOSUREMETERINGMODE_T m_mode;
-    if (strcmp(cfg_stru[c_metering_mode], "average") == 0)
+    if (strcmp(cfg_stru[c_metering_mode], "average") == 0) {
         m_mode = MMAL_PARAM_EXPOSUREMETERINGMODE_AVERAGE;
-    else if (strcmp(cfg_stru[c_metering_mode], "spot") == 0)
+    } else if (strcmp(cfg_stru[c_metering_mode], "spot") == 0) {
         m_mode = MMAL_PARAM_EXPOSUREMETERINGMODE_SPOT;
-    else if (strcmp(cfg_stru[c_metering_mode], "backlit") == 0)
+    } else if (strcmp(cfg_stru[c_metering_mode], "backlit") == 0) {
         m_mode = MMAL_PARAM_EXPOSUREMETERINGMODE_BACKLIT;
-    else if (strcmp(cfg_stru[c_metering_mode], "matrix") == 0)
+    } else if (strcmp(cfg_stru[c_metering_mode], "matrix") == 0) {
         m_mode = MMAL_PARAM_EXPOSUREMETERINGMODE_MATRIX;
-    else {
+    } else {
         error("Invalid metering mode", 0);
         return;
     }
@@ -859,58 +859,59 @@ void cam_set_mm() {
 
 void cam_set_ie() {
     MMAL_PARAM_IMAGEFX_T imageFX;
-    if (strcmp(cfg_stru[c_image_effect], "none") == 0)
+    if (strcmp(cfg_stru[c_image_effect], "none") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_NONE;
-    else if (strcmp(cfg_stru[c_image_effect], "negative") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "negative") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_NEGATIVE;
-    else if (strcmp(cfg_stru[c_image_effect], "solarise") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "solarise") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_SOLARIZE;
-    else if (strcmp(cfg_stru[c_image_effect], "sketch") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "sketch") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_SKETCH;
-    else if (strcmp(cfg_stru[c_image_effect], "denoise") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "denoise") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_DENOISE;
-    else if (strcmp(cfg_stru[c_image_effect], "emboss") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "emboss") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_EMBOSS;
-    else if (strcmp(cfg_stru[c_image_effect], "oilpaint") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "oilpaint") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_OILPAINT;
-    else if (strcmp(cfg_stru[c_image_effect], "hatch") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "hatch") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_HATCH;
-    else if (strcmp(cfg_stru[c_image_effect], "gpen") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "gpen") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_GPEN;
-    else if (strcmp(cfg_stru[c_image_effect], "pastel") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "pastel") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_PASTEL;
-    else if (strcmp(cfg_stru[c_image_effect], "watercolour") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "watercolour") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_WATERCOLOUR;
-    else if (strcmp(cfg_stru[c_image_effect], "film") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "film") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_FILM;
-    else if (strcmp(cfg_stru[c_image_effect], "blur") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "blur") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_BLUR;
-    else if (strcmp(cfg_stru[c_image_effect], "saturation") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "saturation") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_SATURATION;
-    else if (strcmp(cfg_stru[c_image_effect], "colourswap") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "colourswap") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_COLOURSWAP;
-    else if (strcmp(cfg_stru[c_image_effect], "washedout") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "washedout") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_WASHEDOUT;
-    else if (strcmp(cfg_stru[c_image_effect], "posterise") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "posterise") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_POSTERISE;
-    // else if (strcmp(cfg_stru[c_image_effect], "colourpoint") == 0)
-    //     imageFX = MMAL_PARAM_IMAGEFX_COLOURPOINT;
-    // else if (strcmp(cfg_stru[c_image_effect], "colourbalance") == 0)
-    //     imageFX = MMAL_PARAM_IMAGEFX_COLOURBALANCE;
-    // These 2 seem to kill the camera so set them to none for the moment
-    else if (strcmp(cfg_stru[c_image_effect], "colourpoint") == 0)
+        // else if (strcmp(cfg_stru[c_image_effect], "colourpoint") == 0) {
+        //     imageFX = MMAL_PARAM_IMAGEFX_COLOURPOINT;
+        // } else if (strcmp(cfg_stru[c_image_effect], "colourbalance") == 0) {
+        //     imageFX = MMAL_PARAM_IMAGEFX_COLOURBALANCE;
+        // }
+        // These 2 seem to kill the camera so set them to none for the moment
+    } else if (strcmp(cfg_stru[c_image_effect], "colourpoint") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_NONE;
-    else if (strcmp(cfg_stru[c_image_effect], "colourbalance") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "colourbalance") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_NONE;
-    else if (strcmp(cfg_stru[c_image_effect], "cartoon") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "cartoon") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_CARTOON;
-    else if (strcmp(cfg_stru[c_image_effect], "deinterlacedouble") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "deinterlacedouble") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_DEINTERLACE_DOUBLE;
-    else if (strcmp(cfg_stru[c_image_effect], "deinterlaceadv") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "deinterlaceadv") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_DEINTERLACE_ADV;
-    else if (strcmp(cfg_stru[c_image_effect], "deinterlacefast") == 0)
+    } else if (strcmp(cfg_stru[c_image_effect], "deinterlacefast") == 0) {
         imageFX = MMAL_PARAM_IMAGEFX_DEINTERLACE_FAST;
-    else {
+    } else {
         error("Invalid image effect", 0);
         return;
     }
@@ -1422,8 +1423,8 @@ void start_all(int load_conf) {
     // Create image-resizer
     //
     unsigned int height_temp;
-    height_temp = (unsigned long int)cfg_val[c_width] *
-                  cfg_val[c_video_height] / cfg_val[c_video_width];
+    height_temp = (uint32_t)cfg_val[c_width] * cfg_val[c_video_height] /
+                  cfg_val[c_video_width];
     height_temp -= height_temp % 16;
     status = mmal_component_create("vc.ril.resize", &resizer);
     if (status != MMAL_SUCCESS && status != MMAL_ENOSYS)
@@ -1613,7 +1614,7 @@ void start_all(int load_conf) {
 
     setup_motiondetect();
     // pthread_mutex_unlock(&v_mutex);
-}
+}  // NOLINT
 
 void stop_all(void) {
     // pthread_mutex_lock(&v_mutex);

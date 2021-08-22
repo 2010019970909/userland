@@ -132,25 +132,27 @@ void updateStatus() {
         } else if (i_capturing) {
             snprintf(status, "image");
         } else if (v_capturing) {
-            if (!cfg_val[c_motion_detection])
+            if (!cfg_val[c_motion_detection]) {
                 if (timelapse)
                     snprintf(status, "tl_video");
                 else
                     snprintf(status, "video");
-            else if (timelapse)
+            } else if (timelapse) {
                 snprintf(status, "tl_md_video");
-            else
+            } else {
                 snprintf(status, "md_video");
+            }
         } else {
-            if (!cfg_val[c_motion_detection])
+            if (!cfg_val[c_motion_detection]) {
                 if (timelapse)
                     snprintf(status, "timelapse");
                 else
                     snprintf(status, "ready");
-            else if (timelapse)
+            } else if (timelapse) {
                 snprintf(status, "tl_md_ready");
-            else
+            } else {
                 snprintf(status, "md_ready");
+            }
         }
 
         status_file = fopen(cfg_stru[c_status_file], "w");
@@ -161,13 +163,13 @@ void updateStatus() {
     }
 }
 
-void error(const char *string, char fatal) {
-    printLog("Error: %s\n", string);
+void error(const char *error_string, char fatal) {
+    printLog("Error: %s\n", error_string);
     if (fatal == 0) {
-        exec_macro(cfg_stru[c_error_soft], string);
+        exec_macro(cfg_stru[c_error_soft], error_string);
         return;
     }
-    exec_macro(cfg_stru[c_error_hard], string);
+    exec_macro(cfg_stru[c_error_hard], error_string);
     a_error = 1;
     updateStatus();
     exit(1);

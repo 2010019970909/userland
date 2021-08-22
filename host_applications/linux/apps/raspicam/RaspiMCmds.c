@@ -19,8 +19,8 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \file RaspiMCmds.c
  * Process Pipe Commands for RaspiMJPEG
  *
- * \date 9th Aprl 2015
+ * \date 9th April 2015
  * \Author: Silvan Melchior / Robert Tidey
  *
  * Description
@@ -40,72 +40,77 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Pipe Commands all start with 2 char identifier
  * Usage information in README_RaspiMJPEG.md
  */
-//#define MOTION_INTERNAL
+// #define MOTION_INTERNAL
 #include "RaspiMJPEG.h"
 
 void process_cmd(char *readbuf, int length) {
-    typedef enum pipe_cmd_type { ca,
-                                 im,
-                                 tl,
-                                 px,
-                                 bo,
-                                 tv,
-                                 vi,
-                                 an,
-                                 as,
-                                 at,
-                                 ac,
-                                 ab,
-                                 sh,
-                                 co,
-                                 br,
-                                 sa,
-                                 is,
-                                 vs,
-                                 rl,
-                                 ec,
-                                 em,
-                                 wb,
-                                 ag,
-                                 mm,
-                                 ie,
-                                 ce,
-                                 ro,
-                                 fl,
-                                 ri,
-                                 ss,
-                                 qu,
-                                 pv,
-                                 bi,
-                                 ru,
-                                 md,
-                                 sc,
-                                 rs,
-                                 bu,
-                                 mn,
-                                 mt,
-                                 mi,
-                                 ms,
-                                 mb,
-                                 me,
-                                 mc,
-                                 mx,
-                                 mf,
-                                 mz,
-                                 vm,
-                                 vp,
-                                 wd,
-                                 sy,
-                                 um,
-                                 cn,
-                                 st,
-                                 ls,
-                                 qp } pipe_cmd_type;
-    char pipe_cmds[] = "ca,im,tl,px,bo,tv,vi,an,as,at,ac,ab,sh,co,br,sa,is,vs,rl,ec,em,wb,ag,mm,ie,ce,ro,fl,ri,ss,qu,pv,bi,ru,md,sc,rs,bu,mn,mt,mi,ms,mb,me,mc,mx,mf,mz,vm,vp,wd,sy,um,cn,st,ls,qp";
+    typedef enum pipe_cmd_type {
+        ca,
+        im,
+        tl,
+        px,
+        bo,
+        tv,
+        vi,
+        an,
+        as,
+        at,
+        ac,
+        ab,
+        sh,
+        co,
+        br,
+        sa,
+        is,
+        vs,
+        rl,
+        ec,
+        em,
+        wb,
+        ag,
+        mm,
+        ie,
+        ce,
+        ro,
+        fl,
+        ri,
+        ss,
+        qu,
+        pv,
+        bi,
+        ru,
+        md,
+        sc,
+        rs,
+        bu,
+        mn,
+        mt,
+        mi,
+        ms,
+        mb,
+        me,
+        mc,
+        mx,
+        mf,
+        mz,
+        vm,
+        vp,
+        wd,
+        sy,
+        um,
+        cn,
+        st,
+        ls,
+        qp
+    } pipe_cmd_type;
+    char pipe_cmds[] =
+        "ca,im,tl,px,bo,tv,vi,an,as,at,ac,ab,sh,co,br,sa,is,vs,rl,ec,em,wb,ag,"
+        "mm,ie,ce,ro,fl,ri,ss,qu,pv,bi,ru,md,sc,rs,bu,mn,mt,mi,ms,mb,me,mc,mx,"
+        "mf,mz,vm,vp,wd,sy,um,cn,st,ls,qp";
     pipe_cmd_type pipe_cmd;
     int parcount;
     char pars[128][10];
-    long int par0;
+    int32_t par0;
     char cmd[3];
     char par[MAX_COMMAND_LEN];
     char *parstring = 0, *temp, *settingsback;
@@ -124,17 +129,17 @@ void process_cmd(char *readbuf, int length) {
     pipe_cmd = (pipe_cmd_type)((temp - pipe_cmds) / 3);
 
     if (length > 3) {
-        strcpy(par, readbuf + 3);
+        snprintf(par, readbuf + 3);
         par[length - 3] = 0;
         // Extract space separated numeric parameters
         // and make separate string parameter (strtok changes the original)
         asprintf(&parstring, "%s", par);
         parcount = 0;
-        temp = strtok(par, " ");
+        temp = strtok_r(par, " ");
         while (parcount < 10 && temp != NULL) {
-            strcpy(pars[parcount], temp);
+            snprintf(pars[parcount], temp);
             parcount++;
-            temp = strtok(NULL, " ");
+            temp = strtok_r(NULL, " ");
         }
         par0 = strtol(pars[0], NULL, 10);
     } else {
@@ -145,14 +150,15 @@ void process_cmd(char *readbuf, int length) {
         case ca:
             if (par0 == 1) {
                 if (parcount > 1) {
-                    long vtime = strtol(pars[1], NULL, 10);
+                    int32_t vtime = strtol(pars[1], NULL, 10);
                     video_stoptime = time(NULL) + vtime;
                     video_stoptimeEnd = video_stoptime;
                     printLog("Capturing %d seconds\n", vtime);
                 }
                 if (cfg_val[c_video_split] > 0) {
                     video_stoptime = time(NULL) + cfg_val[c_video_split];
-                    printLog("Capturing with split of %d seconds\n", cfg_val[c_video_split]);
+                    printLog("Capturing with split of %d seconds\n",
+                             cfg_val[c_video_split]);
                 }
                 start_video(0);
             } else {
@@ -332,9 +338,11 @@ void process_cmd(char *readbuf, int length) {
             break;
         case mx:
             key = c_motion_external;
-            // If switching to internal with motion detection on then try to kill external motion
+            // If switching to internal with motion detection on then try to
+            // kill external motion
             if (cfg_val[c_motion_detection] != 0 && !par0) {
-                if (system("killall motion 2> /dev/null") == -1) error("Could not stop external motion", 1);
+                if (system("killall motion 2> /dev/null") == -1)
+                    error("Could not stop external motion", 1);
                 printLog("External motion detection stopped\n");
             }
             break;
@@ -343,11 +351,13 @@ void process_cmd(char *readbuf, int length) {
             stop_all();
             if (cfg_val[c_motion_external] == 1) {
                 if (par0 == 0) {
-                    if (system("killall motion 2> /dev/null") == -1) error("Could not stop external motion", 1);
+                    if (system("killall motion 2> /dev/null") == -1)
+                        error("Could not stop external motion", 1);
                     printLog("External motion detection stopped\n");
                 } else {
                     if (cfg_val[c_motion_detection] == 0) {
-                        if (system("motion") == -1) error("Could not start external motion", 1);
+                        if (system("motion") == -1)
+                            error("Could not start external motion", 1);
                         printLog("External motion detection started\n");
                     } else {
                         printLog("Motion already running. md 1 ignored\n");
@@ -411,7 +421,7 @@ void process_cmd(char *readbuf, int length) {
             key = c_motion_file;
             break;
         case mz:
-            mask_disable((int)par0);
+            mask_disable(static_cast<int>(par0));
             break;
         case vm:
             key = c_vector_mode;
@@ -436,7 +446,7 @@ void process_cmd(char *readbuf, int length) {
             break;
     }
 
-    //Action any key settings
+    // Action any key settings
     if (key >= 0) {
         if (key < 1000) {
             addUserValue(key, pars[0]);
@@ -448,7 +458,7 @@ void process_cmd(char *readbuf, int length) {
     }
     saveUserConfig(cfg_stru[c_user_config]);
     if (parstring != 0) free(parstring);
-}
+}  // NOLINT
 
 void exec_macro(char *macro, char *filename) {
     char *cmd, *macropath;
