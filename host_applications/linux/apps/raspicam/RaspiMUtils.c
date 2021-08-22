@@ -54,7 +54,7 @@ void mmalLog(char *msg, ...) {
         if (fp != NULL) {
             clock_gettime(CLOCK_REALTIME, &currTime);
             struct tm local_tm;
-            localTime = localtime_r(&(currTime.tv_sec), local_tm;);
+            localTime = localtime_r(&(currTime.tv_sec), &local_tm);
             fprintf(fp, "%02d %lu ", localTime->tm_sec, currTime.tv_nsec);
             vfprintf(fp, msg, args);
             fclose(fp);
@@ -81,7 +81,7 @@ void printLogEx(int logfile, char *msg, ...) {
     if (fp != NULL) {
         clock_gettime(CLOCK_REALTIME, &currTime);
         struct tm local_tm;
-        localTime = localtime_r(&(currTime.tv_sec), local_tm);
+        localTime = localtime_r(&(currTime.tv_sec), &local_tm);
         makeName(&timestamp, "{%Y/%M/%D %h:%m:%s} ");
         fprintf(fp, "%s", timestamp);
         vfprintf(fp, msg, args);
@@ -111,7 +111,7 @@ void printLog(char *msg, ...) {
     if (fp != NULL) {
         clock_gettime(CLOCK_REALTIME, &currTime);
         struct tm local_tm;
-        localTime = localtime_r(&(currTime.tv_sec), local_tm);
+        localTime = localtime_r(&(currTime.tv_sec), &local_tm);
         makeName(&timestamp, "{%Y/%M/%D %h:%m:%s} ");
         fprintf(fp, "%s", timestamp);
         vfprintf(fp, msg, args);

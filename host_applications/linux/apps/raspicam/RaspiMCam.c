@@ -366,7 +366,7 @@ void cam_set_annotation() {
     if (cfg_stru[c_annotation] != 0) {
         clock_gettime(CLOCK_REALTIME, &currTime);
         struct tm local_tm;
-        localTime = localtime_r(&(currTime.tv_sec), local_tm);
+        localTime = localtime_r(&(currTime.tv_sec), &local_tm);
         if (localTime->tm_sec != prev_sec) video_frame = 0;
         makeName(&filename_temp, cfg_stru[c_annotation]);
         enable = MMAL_TRUE;
@@ -425,7 +425,7 @@ void capt_img(void) {
     }
     clock_gettime(CLOCK_REALTIME, &currTime);
     struct tm local_tm;
-    localTime = localtime_r(&(currTime.tv_sec), local_tm);
+    localTime = localtime_r(&(currTime.tv_sec), &local_tm);
     if (timelapse && strlen(cfg_stru[c_lapse_path]) > 10) {
         makeFilename(&filename_image, cfg_stru[c_lapse_path]);
         if (lapse_cnt == 1) {
@@ -539,7 +539,7 @@ void start_video(unsigned char prepare_buf) {
         if (!prepare_buf) {
             clock_gettime(CLOCK_REALTIME, &currTime);
             struct tm local_tm;
-            localTime = localtime_r(&(currTime.tv_sec), local_tm);
+            localTime = localtime_r(&(currTime.tv_sec), &local_tm);
             makeFilename(&filename_recording, cfg_stru[c_video_path]);
             createMediaPath(filename_recording);
             if (cfg_val[c_MP4Box] != 0) {
