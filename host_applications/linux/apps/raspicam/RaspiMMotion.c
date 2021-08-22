@@ -242,8 +242,8 @@ void analyse_vectors2(MMAL_BUFFER_HEADER_T *buffer) {
     if (clip > 50) clip = 50;
     if (vectorsum > (clip * cfg_val[c_motion_threshold]))
         vectorsum = clip * cfg_val[c_motion_threshold];
-    motion_changes = static_cast<int>(motion_changes * (filter - 1) / filter +
-                                      vectorsum / filter + 0.5);
+    motion_changes = (int)(motion_changes * (filter - 1) / filter +  // NOLINT
+                           vectorsum / filter + 0.5);
     switch (motion_state) {
         case 0:
             if (motion_changes >= cfg_val[c_motion_threshold]) {

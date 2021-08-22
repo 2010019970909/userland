@@ -226,8 +226,7 @@ static void h264encoder_buffer_callback(MMAL_PORT_T *port,
 
         if (buffer->flags & MMAL_BUFFER_HEADER_FLAG_CONFIG) {
             if (header_wptr + buffer->length > sizeof(header_bytes)) {
-                printLog("DEBUG 1: %i, %i\n", header_wptr,
-                         static_cast<int> buffer->length);
+                printLog("DEBUG 1: %i, %i\n", header_wptr, (int)buffer->length);  // NOLINT
                 error("Error in header bytes\n", 0);
             } else {
                 mmal_buffer_header_mem_lock(buffer);
@@ -366,7 +365,8 @@ void cam_set_annotation() {
     MMAL_BOOL_T enable;
     if (cfg_stru[c_annotation] != 0) {
         clock_gettime(CLOCK_REALTIME, &currTime);
-        localTime = localtime_r(&(currTime.tv_sec));
+        struct tm local_tm;
+        localTime = localtime_r(&(currTime.tv_sec), local_tm);
         if (localTime->tm_sec != prev_sec) video_frame = 0;
         makeName(&filename_temp, cfg_stru[c_annotation]);
         enable = MMAL_TRUE;
@@ -424,7 +424,8 @@ void capt_img(void) {
         cam_set(c_raw_layer);
     }
     clock_gettime(CLOCK_REALTIME, &currTime);
-    localTime = localtime_r(&(currTime.tv_sec));
+    struct tm local_tm;
+    localTime = localtime_r(&(currTime.tv_sec), local_tm);
     if (timelapse && strlen(cfg_stru[c_lapse_path]) > 10) {
         makeFilename(&filename_image, cfg_stru[c_lapse_path]);
         if (lapse_cnt == 1) {
@@ -537,7 +538,8 @@ void start_video(unsigned char prepare_buf) {
         }
         if (!prepare_buf) {
             clock_gettime(CLOCK_REALTIME, &currTime);
-            localTime = localtime_r(&(currTime.tv_sec));
+            struct tm local_tm;
+            localTime = localtime_r(&(currTime.tv_sec), local_tm);
             makeFilename(&filename_recording, cfg_stru[c_video_path]);
             createMediaPath(filename_recording);
             if (cfg_val[c_MP4Box] != 0) {
@@ -606,7 +608,7 @@ void start_video(unsigned char prepare_buf) {
 void stop_video(unsigned char stop_buf) {
     // pthread_mutex_lock(&v_mutex);
     char *filename_temp;
-    char background;
+    // char background;
 
     if (v_capturing || stop_buf) {
         v_capturing = 0;
@@ -737,7 +739,7 @@ void cam_set_buffer() {
                      (int64_t)cfg_val[c_video_buffer]) /
                     1000;
 
-        cb_buff = reinterpret_cast<char *>(malloc(count));
+        cb_buff = (char *)(malloc(count));  // NOLINT
         if (cb_buff == NULL) {
             error("Unable to allocate circular buffer", 0);
         } else {

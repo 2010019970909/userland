@@ -421,7 +421,7 @@ void process_cmd(char *readbuf, int length) {
             key = c_motion_file;
             break;
         case mz:
-            mask_disable(static_cast<int>(par0));
+            mask_disable((int)(par0));  // NOLINT
             break;
         case vm:
             key = c_vector_mode;
