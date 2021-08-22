@@ -54,17 +54,7 @@ jobs:
         env:
           # VALIDATE_ALL_CODEBASE: false
           # ACTIONS_RUNNER_DEBUG: true
-          FILTER_REGEX_INCLUDE: >
-            (
-            /host_applications/linux/apps/raspicam/README_RaspiMJPEG.md|
-            /host_applications/linux/apps/raspicam/README-RaspiMJPEG-RJT.md|
-            /host_applications/linux/apps/raspicam/RaspiMCam.c|
-            /host_applications/linux/apps/raspicam/RaspiMCmds.c|
-            /host_applications/linux/apps/raspicam/RaspiMJPEG.c|
-            /host_applications/linux/apps/raspicam/RaspiMJPEG.h|
-            /host_applications/linux/apps/raspicam/RaspiMMotion.c|
-            /host_applications/linux/apps/raspicam/RaspiMUtils.c
-            )
+          FILTER_REGEX_INCLUDE: (/host_applications/linux/apps/raspicam/README_RaspiMJPEG.md|/host_applications/linux/apps/raspicam/README-RaspiMJPEG-RJT.md|/host_applications/linux/apps/raspicam/RaspiMCam.c|/host_applications/linux/apps/raspicam/RaspiMCmds.c|/host_applications/linux/apps/raspicam/RaspiMJPEG.c|/host_applications/linux/apps/raspicam/RaspiMJPEG.h|/host_applications/linux/apps/raspicam/RaspiMMotion.c|/host_applications/linux/apps/raspicam/RaspiMUtils.c)
           FILTER_REGEX_EXCLUDE: (./src/*|.vscode/*)
           VALIDATE_JSCPD: false
           # VALIDATE_JSON: true
