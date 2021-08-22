@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (c) 2015, Broadcom Europe Ltd
 Copyright (c) 2015, Silvan Melchior
@@ -19,8 +20,8 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
@@ -38,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <pthread.h>
+// #include <pthread.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -59,18 +60,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define IFRAME_BUFSIZE (128 * 1024)
 #define STD_INTRAPERIOD 60
 extern MMAL_STATUS_T status;
-extern MMAL_COMPONENT_T *camera, *jpegencoder, *jpegencoder2, *h264encoder, *resizer, *null_sink, *splitter;
-extern MMAL_CONNECTION_T *con_cam_pre, *con_spli_res, *con_spli_h264, *con_res_jpeg, *con_cam_h264, *con_cam_jpeg;
-extern FILE *jpegoutput_file, *jpegoutput2_file, *h264output_file, *status_file, *vector_file;
-extern MMAL_POOL_T *pool_jpegencoder, *pool_jpegencoder_in, *pool_jpegencoder2, *pool_h264encoder;
+extern MMAL_COMPONENT_T *camera, *jpegencoder, *jpegencoder2, *h264encoder,
+    *resizer, *null_sink, *splitter;
+extern MMAL_CONNECTION_T *con_cam_pre, *con_spli_res, *con_spli_h264,
+    *con_res_jpeg, *con_cam_h264, *con_cam_jpeg;
+extern FILE *jpegoutput_file, *jpegoutput2_file, *h264output_file, *status_file,
+    *vector_file;
+extern MMAL_POOL_T *pool_jpegencoder, *pool_jpegencoder_in, *pool_jpegencoder2,
+    *pool_h264encoder;
 extern char *cb_buff;
 // extern pthread_mutex_t v_mutex;
 extern char header_bytes[29];
 extern int cb_len, cb_wptr, cb_wrap;
-extern int iframe_buff[IFRAME_BUFSIZE], iframe_buff_wpos, iframe_buff_rpos, header_wptr;
-extern unsigned int tl_cnt, mjpeg_cnt, image_cnt, image2_cnt, lapse_cnt, video_cnt, video_stoptime, video_frame, video_stoptimeEnd;
+extern int iframe_buff[IFRAME_BUFSIZE], iframe_buff_wpos, iframe_buff_rpos,
+    header_wptr;
+extern unsigned int tl_cnt, mjpeg_cnt, image_cnt, image2_cnt, lapse_cnt,
+    video_cnt, video_stoptime, video_frame, video_stoptimeEnd;
 extern char *filename_recording, *filename_image;
-extern unsigned char timelapse, running, autostart, idle, a_error, v_capturing, i_capturing, v_boxing;
+extern unsigned char timelapse, running, autostart, idle, a_error, v_capturing,
+    i_capturing, v_boxing;
 extern unsigned char buffering, buffering_toggle;
 
 #define MAX_COMMAND_LEN 256
@@ -89,7 +97,8 @@ extern int box_tail;
 #define KEY_COUNT 109
 extern char *cfg_strd[KEY_COUNT + 1];
 extern char *cfg_stru[KEY_COUNT + 1];
-extern long int cfg_val[KEY_COUNT + 1];
+// extern long int cfg_val[KEY_COUNT + 1];
+extern int32_t cfg_val[KEY_COUNT + 1];
 extern char *cfg_key[];
 
 // Motion detect data

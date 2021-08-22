@@ -19,8 +19,8 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
@@ -58,8 +58,7 @@ void setup_motiondetect() {
     FILE *mask_file;
     int mask_size, mask_len;
 
-    if (mask_buffer != 0 && mask_buffer_mem != 0)
-        free(mask_buffer_mem);
+    if (mask_buffer != 0 && mask_buffer_mem != 0) free(mask_buffer_mem);
 
     if (vector_buffer != 0) {
         free(vector_buffer);
@@ -70,9 +69,11 @@ void setup_motiondetect() {
 
     if (cfg_val[c_motion_external] != 1) {
         mask_size = motion_width * motion_height;
-        printLog("Set up internal detect width=%d height=%d\n", motion_width, motion_height);
+        printLog("Set up internal detect width=%d height=%d\n", motion_width,
+                 motion_height);
         if (cfg_val[c_motion_file])
-            vector_buffer = (unsigned char *)malloc(mask_size * 4 * VECTOR_BUFFER_FRAMES);
+            vector_buffer =
+                (unsigned char *)malloc(mask_size * 4 * VECTOR_BUFFER_FRAMES);
 
         motion_init_count = cfg_val[c_motion_initframes];
         motion_frame_count = 0;
@@ -83,16 +84,20 @@ void setup_motiondetect() {
             mask_file = fopen(cfg_stru[c_motion_image], "r");
             if (mask_file != NULL) {
                 mask_buffer_mem = (unsigned char *)malloc(mask_size + 256);
-                mask_len = fread(mask_buffer_mem, sizeof *mask_buffer_mem, mask_size + 256, mask_file);
+                mask_len = fread(mask_buffer_mem, sizeof *mask_buffer_mem,
+                                 mask_size + 256, mask_file);
                 fclose(mask_file);
-                //Check for size and header
-                if ((mask_len > mask_size + 10) && (*mask_buffer_mem == 'P') && (*(mask_buffer_mem + 1) == '5')) {
-                    //search for mask size string, data should be 1 byte after this
+                // Check for size and header
+                if ((mask_len > mask_size + 10) && (*mask_buffer_mem == 'P') &&
+                    (*(mask_buffer_mem + 1) == '5')) {
+                    // search for mask size string, data should be 1 byte after
+                    // this
                     mask_buffer = strstr(mask_buffer_mem, "255");
                     if (mask_buffer != NULL) {
                         mask_buffer += 3;
-                        //check size from this point
-                        if ((mask_buffer_mem + mask_len - mask_buffer) >= mask_size) {
+                        // check size from this point
+                        if ((mask_buffer_mem + mask_len - mask_buffer) >=
+                            mask_size) {
                             mask_valid = 1;
                         }
                     }
@@ -102,10 +107,12 @@ void setup_motiondetect() {
                     mask_buffer = 0;
                     error("invalid motion mask", 0);
                 } else {
-                    printLog("Motion mask %s loaded\n", cfg_stru[c_motion_image]);
+                    printLog("Motion mask %s loaded\n",
+                             cfg_stru[c_motion_image]);
                 }
             } else {
-                printLog("Can't open mask_image %s. Full path needed.\n", cfg_stru[c_motion_image]);
+                printLog("Can't open mask_image %s. Full path needed.\n",
+                         cfg_stru[c_motion_image]);
             }
         }
     }
@@ -133,15 +140,15 @@ void analyse_vectors(MMAL_BUFFER_HEADER_T *buffer) {
     if (cfg_val[c_motion_external] != 1) {
         if (motion_init_count < 1) {
             if (buffer->length >= (4 * motion_width * motion_height)) {
-                if (cfg_val[c_motion_detection] || cfg_val[c_motion_external] == 2) {
+                if (cfg_val[c_motion_detection] ||
+                    cfg_val[c_motion_external] == 2) {
                     if (cfg_val[c_motion_noise] < 1000) {
                         analyse_vectors1(buffer);
                     } else {
                         analyse_vectors2(buffer);
                     }
                 }
-                if (cfg_val[c_motion_file])
-                    save_vectors(buffer);
+                if (cfg_val[c_motion_file]) save_vectors(buffer);
             } else {
                 printLog("Unexpected vector buffer size %d\n", buffer->length);
             }
@@ -153,7 +160,8 @@ void analyse_vectors(MMAL_BUFFER_HEADER_T *buffer) {
 
 void analyse_vectors1(MMAL_BUFFER_HEADER_T *buffer) {
     unsigned char *data = buffer->data;
-    unsigned char high_noise = 255 - cfg_val[c_motion_noise], low_noise = cfg_val[c_motion_noise];
+    unsigned char high_noise = 255 - cfg_val[c_motion_noise],
+                  low_noise = cfg_val[c_motion_noise];
     int i, m, row, col;
     i = 0;
     m = 0;
@@ -161,8 +169,10 @@ void analyse_vectors1(MMAL_BUFFER_HEADER_T *buffer) {
     for (row = 0; row < motion_height; row++) {
         for (col = 0; col < motion_width; col++) {
             if (mask_disabled == 1 || mask_valid == 0 || mask_buffer[m]) {
-                if (data[i] > low_noise && data[i] < high_noise) motion_changes++;
-                if (data[i + 1] > low_noise && data[i + 1] < high_noise) motion_changes++;
+                if (data[i] > low_noise && data[i] < high_noise)
+                    motion_changes++;
+                if (data[i + 1] > low_noise && data[i + 1] < high_noise)
+                    motion_changes++;
             }
             m++;
             i += 4;
@@ -208,7 +218,8 @@ void analyse_vectors2(MMAL_BUFFER_HEADER_T *buffer) {
     for (row = 1; row < (motion_height - 1); row++) {
         for (col = 1; col < (motion_width - 1); col++) {
             if (mask_disabled == 1 || mask_valid == 0 || mask_buffer[m]) {
-                if (data[i - 4] && data[i + 4] && data[i - buffer_width] && data[i + buffer_width]) {
+                if (data[i - 4] && data[i + 4] && data[i - buffer_width] &&
+                    data[i + buffer_width]) {
                     if (data[i] < 128)
                         vectorsum += data[i];
                     else
@@ -224,12 +235,15 @@ void analyse_vectors2(MMAL_BUFFER_HEADER_T *buffer) {
         }
     }
 
-    // Clip vectorsum at threee threshold to stop large bursts triggering limited to 200 ->5000%
+    // Clip vectorsum at threee threshold to stop large bursts triggering
+    // limited to 200 ->5000%
     clip = cfg_val[c_motion_clip];
     if (clip < 2) clip = 2;
     if (clip > 50) clip = 50;
-    if (vectorsum > (clip * cfg_val[c_motion_threshold])) vectorsum = clip * cfg_val[c_motion_threshold];
-    motion_changes = (int)(motion_changes * (filter - 1) / filter + vectorsum / filter + 0.5);
+    if (vectorsum > (clip * cfg_val[c_motion_threshold]))
+        vectorsum = clip * cfg_val[c_motion_threshold];
+    motion_changes = static_cast<int>(motion_changes * (filter - 1) / filter +
+                                      vectorsum / filter + 0.5);
     switch (motion_state) {
         case 0:
             if (motion_changes >= cfg_val[c_motion_threshold]) {
@@ -275,7 +289,9 @@ void start_vectors(char *vectorname) {
         vector_file = fopen(vector_temp, "a");
         free(vector_temp);
         if (vector_file == NULL) error("Could not open vector destination", 1);
-        fseek(vector_file, motion_width * motion_height * 4 * VECTOR_BUFFER_FRAMES, SEEK_SET);
+        fseek(vector_file,
+              motion_width * motion_height * 4 * VECTOR_BUFFER_FRAMES,
+              SEEK_SET);
     }
 }
 
@@ -285,11 +301,15 @@ void stop_vectors() {
     if (vector_file != NULL) {
         fseek(vector_file, 0, SEEK_SET);
         for (index = 1; index <= VECTOR_BUFFER_FRAMES; index++) {
-            fwrite(vector_buffer + ((vector_buffer_index + index) % VECTOR_BUFFER_FRAMES) * buf_size, 1, buf_size, vector_file);
+            fwrite(vector_buffer +
+                       ((vector_buffer_index + index) % VECTOR_BUFFER_FRAMES) *
+                           buf_size,
+                   1, buf_size, vector_file);
         }
         fclose(vector_file);
         vector_file = NULL;
-        memset(vector_buffer, 0, motion_width * motion_height * 4 * VECTOR_BUFFER_FRAMES);
+        memset(vector_buffer, 0,
+               motion_width * motion_height * 4 * VECTOR_BUFFER_FRAMES);
         vector_buffer_index = 0;
     }
 }
@@ -300,12 +320,15 @@ void save_vectors(MMAL_BUFFER_HEADER_T *buffer) {
     if (cfg_val[c_motion_file]) {
         if (vector_file != NULL) {
             // Append data to vector file
-            bytes_written = fwrite(buffer->data, 1, buffer->length, vector_file);
-            if (bytes_written != buffer->length) error("Could not write all motion vector data", 0);
+            bytes_written =
+                fwrite(buffer->data, 1, buffer->length, vector_file);
+            if (bytes_written != buffer->length)
+                error("Could not write all motion vector data", 0);
         } else {
             // Write to circular buffer of vector data
             int buf_size = motion_width * motion_height * 4;
-            memcpy(vector_buffer + buf_size * vector_buffer_index, buffer->data, buf_size);
+            memcpy(vector_buffer + buf_size * vector_buffer_index, buffer->data,
+                   buf_size);
             vector_buffer_index++;
             if (vector_buffer_index >= VECTOR_BUFFER_FRAMES) {
                 vector_buffer_index = 0;

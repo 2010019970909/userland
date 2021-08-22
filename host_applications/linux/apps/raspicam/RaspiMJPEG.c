@@ -18,8 +18,8 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
@@ -51,10 +51,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RaspiMJPEG.h"
 
 MMAL_STATUS_T status;
-MMAL_COMPONENT_T *camera = 0, *jpegencoder = 0, *jpegencoder2 = 0, *h264encoder = 0, *resizer = 0, *null_sink = 0, *splitter = 0;
-MMAL_CONNECTION_T *con_cam_pre = 0, *con_spli_res = 0, *con_spli_h264 = 0, *con_res_jpeg = 0, *con_cam_h264 = 0, *con_cam_jpeg = 0;
-FILE *jpegoutput_file = NULL, *jpegoutput2_file = NULL, *h264output_file = NULL, *status_file = NULL, *vector_file = NULL;
-MMAL_POOL_T *pool_jpegencoder = 0, *pool_jpegencoder_in = 0, *pool_jpegencoder2 = 0, *pool_h264encoder = 0;
+MMAL_COMPONENT_T *camera = 0, *jpegencoder = 0, *jpegencoder2 = 0,
+                 *h264encoder = 0, *resizer = 0, *null_sink = 0, *splitter = 0;
+MMAL_CONNECTION_T *con_cam_pre = 0, *con_spli_res = 0, *con_spli_h264 = 0,
+                  *con_res_jpeg = 0, *con_cam_h264 = 0, *con_cam_jpeg = 0;
+FILE *jpegoutput_file = NULL, *jpegoutput2_file = NULL, *h264output_file = NULL,
+     *status_file = NULL, *vector_file = NULL;
+MMAL_POOL_T *pool_jpegencoder = 0, *pool_jpegencoder_in = 0,
+            *pool_jpegencoder2 = 0, *pool_h264encoder = 0;
 char *cb_buff = NULL;
 
 char readbuf[FIFO_MAX][2 * MAX_COMMAND_LEN];
@@ -64,43 +68,134 @@ int fd[FIFO_MAX], readi[FIFO_MAX];
 
 char header_bytes[29];
 int cb_len, cb_wptr, cb_wrap;
-int iframe_buff[IFRAME_BUFSIZE], iframe_buff_wpos, iframe_buff_rpos, header_wptr;
-unsigned int tl_cnt = 0, mjpeg_cnt = 0, image_cnt = 0, image2_cnt = 0, lapse_cnt = 0, video_cnt = 0, video_stoptime = 0, video_frame, video_stoptimeEnd;
+int iframe_buff[IFRAME_BUFSIZE], iframe_buff_wpos, iframe_buff_rpos,
+    header_wptr;
+unsigned int tl_cnt = 0, mjpeg_cnt = 0, image_cnt = 0, image2_cnt = 0,
+             lapse_cnt = 0, video_cnt = 0, video_stoptime = 0, video_frame,
+             video_stoptimeEnd;
 char *filename_recording = 0, *filename_image = 0;
-unsigned char timelapse = 0, running = 1, autostart = 1, idle = 0, a_error = 0, v_capturing = 0, i_capturing = 0, v_boxing = 0;
+unsigned char timelapse = 0, running = 1, autostart = 1, idle = 0, a_error = 0,
+              v_capturing = 0, i_capturing = 0, v_boxing = 0;
 unsigned char buffering = 0, buffering_toggle = 0;
 char *box_files[MAX_BOX_FILES];
 int box_head = 0;
 int box_tail = 0;
 char *cfg_strd[KEY_COUNT + 1];
 char *cfg_stru[KEY_COUNT + 1];
-long int cfg_val[KEY_COUNT + 1];
+// long int cfg_val[KEY_COUNT + 1];
+int32_t cfg_val[KEY_COUNT + 1];
 
-char *cfg_key[] = {
-    "annotation", "anno_background",
-    "anno3_custom_background_colour", "anno3_custom_background_Y", "anno3_custom_background_U", "anno3_custom_background_V",
-    "anno3_custom_text_colour", "anno3_custom_text_Y", "anno3_custom_text_U", "anno3_custom_text_V", "anno_text_size",
-    "sharpness", "contrast", "brightness", "saturation", "iso",
-    "metering_mode", "video_stabilisation", "exposure_compensation", "exposure_mode", "white_balance", "image_effect",
-    "autowbgain_r", "autowbgain_b",
-    "colour_effect_en", "colour_effect_u", "colour_effect_v",
-    "rotation", "hflip", "vflip",
-    "sensor_region_x", "sensor_region_y", "sensor_region_w", "sensor_region_h",
-    "shutter_speed", "raw_layer",
-    "width", "quality", "divider",
-    "video_width", "video_height", "video_fps", "fps_divider", "video_bitrate", "video_buffer", "video_split",
-    "MP4Box", "MP4Box_fps", "boxing_path", "MP4Box_cmd",
-    "image_width", "image_height", "image_quality", "tl_interval",
-    "base_path", "preview_path", "image_path", "lapse_path", "video_path", "status_file", "control_file", "media_path", "macros_path", "subdir_char", "enforce_lf", "fifo_interval",
-    "thumb_gen", "autostart", "motion_detection", "motion_file", "vector_preview", "vector_mode", "motion_external",
-    "motion_noise", "motion_threshold", "motion_image", "motion_initframes", "motion_startframes", "motion_stopframes", "motion_pipe", "motion_clip", "motion_logfile",
-    "user_config", "log_file", "log_size", "watchdog_interval", "watchdog_errors", "h264_buffer_size", "h264_buffers", "callback_timeout",
-    "error_soft", "error_hard", "start_img", "end_img", "start_vid", "end_vid", "end_box", "do_cmd", "motion_event", "startstop",
-    "camera_num", "stat_pass", "user_annotate", "count_format", "minimise_frag", "initial_quant", "encode_qp", "mmal_logfile", "stop_pause"};
+char *cfg_key[] = {"annotation",
+                   "anno_background",
+                   "anno3_custom_background_colour",
+                   "anno3_custom_background_Y",
+                   "anno3_custom_background_U",
+                   "anno3_custom_background_V",
+                   "anno3_custom_text_colour",
+                   "anno3_custom_text_Y",
+                   "anno3_custom_text_U",
+                   "anno3_custom_text_V",
+                   "anno_text_size",
+                   "sharpness",
+                   "contrast",
+                   "brightness",
+                   "saturation",
+                   "iso",
+                   "metering_mode",
+                   "video_stabilisation",
+                   "exposure_compensation",
+                   "exposure_mode",
+                   "white_balance",
+                   "image_effect",
+                   "autowbgain_r",
+                   "autowbgain_b",
+                   "colour_effect_en",
+                   "colour_effect_u",
+                   "colour_effect_v",
+                   "rotation",
+                   "hflip",
+                   "vflip",
+                   "sensor_region_x",
+                   "sensor_region_y",
+                   "sensor_region_w",
+                   "sensor_region_h",
+                   "shutter_speed",
+                   "raw_layer",
+                   "width",
+                   "quality",
+                   "divider",
+                   "video_width",
+                   "video_height",
+                   "video_fps",
+                   "fps_divider",
+                   "video_bitrate",
+                   "video_buffer",
+                   "video_split",
+                   "MP4Box",
+                   "MP4Box_fps",
+                   "boxing_path",
+                   "MP4Box_cmd",
+                   "image_width",
+                   "image_height",
+                   "image_quality",
+                   "tl_interval",
+                   "base_path",
+                   "preview_path",
+                   "image_path",
+                   "lapse_path",
+                   "video_path",
+                   "status_file",
+                   "control_file",
+                   "media_path",
+                   "macros_path",
+                   "subdir_char",
+                   "enforce_lf",
+                   "fifo_interval",
+                   "thumb_gen",
+                   "autostart",
+                   "motion_detection",
+                   "motion_file",
+                   "vector_preview",
+                   "vector_mode",
+                   "motion_external",
+                   "motion_noise",
+                   "motion_threshold",
+                   "motion_image",
+                   "motion_initframes",
+                   "motion_startframes",
+                   "motion_stopframes",
+                   "motion_pipe",
+                   "motion_clip",
+                   "motion_logfile",
+                   "user_config",
+                   "log_file",
+                   "log_size",
+                   "watchdog_interval",
+                   "watchdog_errors",
+                   "h264_buffer_size",
+                   "h264_buffers",
+                   "callback_timeout",
+                   "error_soft",
+                   "error_hard",
+                   "start_img",
+                   "end_img",
+                   "start_vid",
+                   "end_vid",
+                   "end_box",
+                   "do_cmd",
+                   "motion_event",
+                   "startstop",
+                   "camera_num",
+                   "stat_pass",
+                   "user_annotate",
+                   "count_format",
+                   "minimise_frag",
+                   "initial_quant",
+                   "encode_qp",
+                   "mmal_logfile",
+                   "stop_pause"};
 
-void term(int signum) {
-    running = 0;
-}
+void term(int signum) { running = 0; }
 
 void set_counts() {
     image2_cnt = findNextCount(cfg_stru[c_image_path], "it");
@@ -145,12 +240,11 @@ void addValue(int keyI, char *value, int both) {
                 } else if (strcmp(value, "standard") == 0) {
                     val = 1;
                     idle = 0;
-                };
+                }
                 updateStatus();
                 break;
             case c_MP4Box:
-                if (strcmp(value, "background") == 0)
-                    val = 2;
+                if (strcmp(value, "background") == 0) val = 2;
         }
         cfg_val[keyI] = val;
     }
@@ -168,7 +262,8 @@ void saveUserConfig(char *cfilename) {
     if (fp != NULL) {
         for (i = 0; i < KEY_COUNT; i++) {
             if (strlen(cfg_key[i]) > 0) {
-                if (cfg_stru[i] != 0 && cfg_strd[i] != 0 && strcmp(cfg_strd[i], cfg_stru[i]) != 0) {
+                if (cfg_stru[i] != 0 && cfg_strd[i] != 0 &&
+                    strcmp(cfg_strd[i], cfg_stru[i]) != 0) {
                     fprintf(fp, "%s %s\n", cfg_key[i], cfg_stru[i]);
                 } else if (cfg_stru[i] != 0 && cfg_strd[i] == 0) {
                     fprintf(fp, "%s %s\n", cfg_key[i], cfg_stru[i]);
@@ -278,7 +373,7 @@ int main(int argc, char *argv[]) {
             printf("RaspiMJPEG Version %s\n", VERSION);
             exit(0);
 
-        // Enable motion detection
+            // Enable motion detection
         } else if (strcmp(argv[i], "-md") == 0) {
             cfg_val[c_motion_detection] = 1;
         }
@@ -291,8 +386,7 @@ int main(int argc, char *argv[]) {
     // Read configs and init
     //
     read_config("/etc/raspimjpeg", 1);
-    if (cfg_stru[c_user_config] != 0)
-        read_config(cfg_stru[c_user_config], 0);
+    if (cfg_stru[c_user_config] != 0) read_config(cfg_stru[c_user_config], 0);
 
     createPath(cfg_stru[c_log_file], cfg_stru[c_base_path]);
     if (cfg_stru[c_boxing_path] != NULL) {
@@ -324,9 +418,9 @@ int main(int argc, char *argv[]) {
     }
     for (i = 0; i < FIFO_MAX; i++) {
         if (i == 0) {
-            sprintf(fdName[i], "%s", cfg_stru[c_control_file]);
+            snprintf(fdName[i], "%s", cfg_stru[c_control_file]);
         } else {
-            sprintf(fdName[i], "%s%d", cfg_stru[c_control_file], i + 10);
+            snprintf(fdName[i], "%s%d", cfg_stru[c_control_file], i + 10);
         }
     }
 
@@ -339,8 +433,7 @@ int main(int argc, char *argv[]) {
                 length = read(fd[i], readbuf[0], 60);
                 close(fd[i]);
             } else {
-                if (i == 0)
-                    error("Could not open main PIPE", 1);
+                if (i == 0) error("Could not open main PIPE", 1);
             }
         } while (fd[i] >= 0 && length != 0);
     }
@@ -359,10 +452,12 @@ int main(int argc, char *argv[]) {
         // Kick off motion detection at start if required.
         if (cfg_val[c_motion_detection] && cfg_val[c_motion_external] == 1) {
             printLog("Autostart external motion kill any running motion\n");
-            if (system("killall motion 2> /dev/null") == -1) error("Could not stop external motion", 1);
+            if (system("killall motion 2> /dev/null") == -1)
+                error("Could not stop external motion", 1);
             sleep(1);
             printLog("Autostart external motion start external motion\n");
-            if (system("motion") == -1) error("Could not start external motion", 1);
+            if (system("motion") == -1)
+                error("Could not start external motion", 1);
         }
     } else {
         if (cfg_stru[c_control_file] != 0)
@@ -376,8 +471,7 @@ int main(int argc, char *argv[]) {
     send_schedulecmd("9");
 
     printLog("Starting command loop\n");
-    if (cfg_val[c_fifo_interval] < 100000)
-        cfg_val[c_fifo_interval] = 100000;
+    if (cfg_val[c_fifo_interval] < 100000) cfg_val[c_fifo_interval] = 100000;
     while (running == 1) {
         for (i = 0; i < FIFO_MAX; i++) {
             checkPipe(i);
@@ -416,11 +510,14 @@ int main(int argc, char *argv[]) {
             watchdog_errors = 0;
         }
         if (++onesec_check >= 10) {
-            // Run check on background boxing every 10 ticks and check for video timer if capturing
+            // Run check on background boxing every 10 ticks and check for video
+            // timer if capturing
             onesec_check = 0;
-            // 4.9 compiler seems to want a print after the box finish to get input FIFO working again
+            // 4.9 compiler seems to want a print after the box finish to get
+            // input FIFO working again
             if (check_box_files()) printLog("Removed item from Box Queue\n");
-            // Check to make sure image operation not stuck (no callback) if enabled
+            // Check to make sure image operation not stuck (no callback) if
+            // enabled
             if ((cfg_val[c_callback_timeout] > 0) && i_capturing) {
                 i_capturing--;
                 if (i_capturing == 0) {
@@ -432,12 +529,16 @@ int main(int argc, char *argv[]) {
                 if (time(NULL) >= video_stoptime) {
                     printLog("Stopping video from timer\n");
                     stop_video(0);
-                    if (cfg_val[c_video_split] > 0 && (video_stoptimeEnd == 0 || video_stoptimeEnd > time(NULL))) {
+                    if (cfg_val[c_video_split] > 0 &&
+                        (video_stoptimeEnd == 0 ||
+                         video_stoptimeEnd > time(NULL))) {
                         video_stoptime = time(NULL) + cfg_val[c_video_split];
-                        if (video_stoptimeEnd != 0 && video_stoptime >= video_stoptimeEnd) {
+                        if (video_stoptimeEnd != 0 &&
+                            video_stoptime >= video_stoptimeEnd) {
                             video_stoptime = video_stoptimeEnd;
                         }
-                        printLog("Restarting next split of %d seconds\n", cfg_val[c_video_split]);
+                        printLog("Restarting next split of %d seconds\n",
+                                 cfg_val[c_video_split]);
                         start_video(0);
                     }
                 }
@@ -447,7 +548,8 @@ int main(int argc, char *argv[]) {
     }
 
     close(fd);
-    if (system("killall motion 2> /dev/null") == -1) error("Could not stop external motion", 1);
+    if (system("killall motion 2> /dev/null") == -1)
+        error("Could not stop external motion", 1);
 
     printLog("SIGINT/SIGTERM received, stopping\n");
     //

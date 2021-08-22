@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2015, Broadcom Europe Ltd
 Copyright (c) 2015, Silvan Melchior
-Copyright (c) 2015, Robert Tidey 
+Copyright (c) 2015, Robert Tidey
 Copyright (c) 2015, James Hughes
 All rights reserved.
 
@@ -19,8 +19,8 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * \file RaspiMUtils.c
  * Utilities for RaspiMJPEG.c
- * Also optionally stream a preview of current camera input wth MJPEG.
+ * Also optionally stream a preview of current camera input with MJPEG.
  *
- * \date 9th Aprl 2015
+ * \date 9th April 2015
  * \Author: Silvan Melchior / Robert Tidey
  *
  * Description
@@ -53,7 +53,7 @@ void mmalLog(char *msg, ...) {
         fp = fopen(cfg_stru[c_mmal_logfile], "a");
         if (fp != NULL) {
             clock_gettime(CLOCK_REALTIME, &currTime);
-            localTime = localtime(&(currTime.tv_sec));
+            localTime = localtime_r(&(currTime.tv_sec));
             fprintf(fp, "%02d %lu ", localTime->tm_sec, currTime.tv_nsec);
             vfprintf(fp, msg, args);
             fclose(fp);
@@ -79,7 +79,7 @@ void printLogEx(int logfile, char *msg, ...) {
     }
     if (fp != NULL) {
         clock_gettime(CLOCK_REALTIME, &currTime);
-        localTime = localtime(&(currTime.tv_sec));
+        localTime = localtime_r(&(currTime.tv_sec));
         makeName(&timestamp, "{%Y/%M/%D %h:%m:%s} ");
         fprintf(fp, "%s", timestamp);
         vfprintf(fp, msg, args);
@@ -108,7 +108,7 @@ void printLog(char *msg, ...) {
     }
     if (fp != NULL) {
         clock_gettime(CLOCK_REALTIME, &currTime);
-        localTime = localtime(&(currTime.tv_sec));
+        localTime = localtime_r(&(currTime.tv_sec));
         makeName(&timestamp, "{%Y/%M/%D %h:%m:%s} ");
         fprintf(fp, "%s", timestamp);
         vfprintf(fp, msg, args);
@@ -126,31 +126,31 @@ void updateStatus() {
 
     if (cfg_stru[c_status_file] != 0) {
         if (a_error) {
-            strcpy(status, "Error");
+            snprintf(status, "Error");
         } else if (idle) {
-            strcpy(status, "halted");
+            snprintf(status, "halted");
         } else if (i_capturing) {
-            strcpy(status, "image");
+            snprintf(status, "image");
         } else if (v_capturing) {
             if (!cfg_val[c_motion_detection])
                 if (timelapse)
-                    strcpy(status, "tl_video");
+                    snprintf(status, "tl_video");
                 else
-                    strcpy(status, "video");
+                    snprintf(status, "video");
             else if (timelapse)
-                strcpy(status, "tl_md_video");
+                snprintf(status, "tl_md_video");
             else
-                strcpy(status, "md_video");
+                snprintf(status, "md_video");
         } else {
             if (!cfg_val[c_motion_detection])
                 if (timelapse)
-                    strcpy(status, "timelapse");
+                    snprintf(status, "timelapse");
                 else
-                    strcpy(status, "ready");
+                    snprintf(status, "ready");
             else if (timelapse)
-                strcpy(status, "tl_md_ready");
+                snprintf(status, "tl_md_ready");
             else
-                strcpy(status, "md_ready");
+                snprintf(status, "md_ready");
         }
 
         status_file = fopen(cfg_stru[c_status_file], "w");
@@ -189,11 +189,11 @@ int findNextCount(char *folder, char *source) {
         *s = 0;
         s = strrchr(search, '/');
         if (s != NULL) {
-            //truncate off to get base path and open it
+            // truncate off to get base path and open it
             *s = 0;
             dp = opendir(search);
             if (dp != NULL) {
-                //scan the contents
+                // scan the contents
                 while ((fp = readdir(dp))) {
                     s = fp->d_name;
                     // check if name is a thumbnail
@@ -201,14 +201,14 @@ int findNextCount(char *folder, char *source) {
                     if (e > s && strcmp(e, ".th.jpg") == 0) {
                         // truncate where number should end
                         *e = 0;
-                        //search to find beginning of field
+                        // search to find beginning of field
                         s = strrchr(s, '.');
                         if (s != NULL) {
-                            //set start to beginning
+                            // set start to beginning
                             s++;
-                            //see if it a comparison type
+                            // see if it a comparison type
                             if (strchr(source, *s) != NULL) {
-                                //extract number and set maximum
+                                // extract number and set maximum
                                 found = 1;
                                 current_count = strtoul(s + 1, &e, 10);
                                 if (current_count > max_count) {
@@ -229,15 +229,13 @@ int findNextCount(char *folder, char *source) {
 char *trim(char *s) {
     if (s == NULL) return NULL;
     char *end = s + strlen(s) - 1;
-    while (*s && isspace(*s))
-        *s++ = 0;
-    while (isspace(*end))
-        *end-- = 0;
+    while (*s && isspace(*s)) *s++ = 0;
+    while (isspace(*end)) *end-- = 0;
     return s;
 }
 
 void makeName(char **name, char *template) {
-    //Create name from template
+    // Create name from template
     const int max_subs = 24;
     char spec[16] = "%YyMDhmsuvitfcka";
     char *template1;
@@ -248,16 +246,16 @@ void makeName(char **name, char *template) {
     FILE *fp;
 
     memset(p, 0, sizeof p);
-    //get copy of template to work with
+    // get copy of template to work with
     asprintf(&template1, "%s", template);
     s = template1;
     if (s != NULL) {
-        //start and end pointers
-        //successively search through template for % specifiers
+        // start and end pointers
+        // successively search through template for % specifiers
         while (*s && si < max_subs && strlen(p) < 255) {
             if (*s == '%') {
                 s++;
-                //find which specifier it is or default to unknown
+                // find which specifier it is or default to unknown
                 f = strchr(spec, *s);
                 if (f == NULL) {
                     sp = strlen(spec);
@@ -267,49 +265,49 @@ void makeName(char **name, char *template) {
                 q = p + strlen(p);
                 switch (sp) {
                     case 0:
-                        sprintf(q, "%s", "%");
+                        snprintf(q, "%s", "%");
                         break;
                     case 1:
-                        sprintf(q, "%04d", localTime->tm_year + 1900);
+                        snprintf(q, "%04d", localTime->tm_year + 1900);
                         break;
                     case 2:
-                        sprintf(q, "%02d", (localTime->tm_year + 1900) % 100);
+                        snprintf(q, "%02d", (localTime->tm_year + 1900) % 100);
                         break;
                     case 3:
-                        sprintf(q, "%02d", localTime->tm_mon + 1);
+                        snprintf(q, "%02d", localTime->tm_mon + 1);
                         break;
                     case 4:
-                        sprintf(q, "%02d", localTime->tm_mday);
+                        snprintf(q, "%02d", localTime->tm_mday);
                         break;
                     case 5:
-                        sprintf(q, "%02d", localTime->tm_hour);
+                        snprintf(q, "%02d", localTime->tm_hour);
                         break;
                     case 6:
-                        sprintf(q, "%02d", localTime->tm_min);
+                        snprintf(q, "%02d", localTime->tm_min);
                         break;
                     case 7:
-                        sprintf(q, "%02d", localTime->tm_sec);
+                        snprintf(q, "%02d", localTime->tm_sec);
                         break;
                     case 8:
-                        sprintf(q, "%03d", currTime.tv_nsec / 1000000);
+                        snprintf(q, "%03d", currTime.tv_nsec / 1000000);
                         break;
                     case 9:
-                        sprintf(q, cfg_stru[c_count_format], video_cnt);
+                        snprintf(q, cfg_stru[c_count_format], video_cnt);
                         break;
                     case 10:
-                        sprintf(q, cfg_stru[c_count_format], image2_cnt);
+                        snprintf(q, cfg_stru[c_count_format], image2_cnt);
                         break;
                     case 11:
-                        sprintf(q, cfg_stru[c_count_format], lapse_cnt);
+                        snprintf(q, cfg_stru[c_count_format], lapse_cnt);
                         break;
                     case 12:
-                        sprintf(q, "%04d", motion_frame_count);
+                        snprintf(q, "%04d", motion_frame_count);
                         break;
                     case 13:
-                        sprintf(q, "%04d", motion_changes);
+                        snprintf(q, "%04d", motion_changes);
                         break;
                     case 14:
-                        sprintf(q, "%02d", video_frame);
+                        snprintf(q, "%02d", video_frame);
                         break;
                     case 15:
                         if (cfg_stru[c_user_annotate] != NULL) {
@@ -335,7 +333,7 @@ void makeName(char **name, char *template) {
 
 void makeFilename(char **filename, char *template) {
     char *template1;
-    //allow paths to be relative to media path
+    // allow paths to be relative to media path
     if (*template != '/') {
         asprintf(&template1, "%s/%s", cfg_stru[c_media_path], template);
         makeName(filename, template1);
@@ -350,10 +348,10 @@ void createPath(char *filename, char *path) {
     char *t;
     int r = 0;
     struct stat buf;
-    //Create folders under path in filename as needed
+    // Create folders under path in filename as needed
     if (filename != NULL && strncmp(filename, path, strlen(path)) == 0) {
         stat(path, &buf);
-        //s to trailing path
+        // s to trailing path
         s = filename + strlen(path) + 1;
         do {
             t = strchr(s, '/');
@@ -382,8 +380,7 @@ int copy_file(char *from_filename, char *to_filename) {
     char buffer[4096];
     size_t bytes;
 
-    if ((fd_from = fopen(from_filename, "r")) == NULL)
-        return -1;
+    if ((fd_from = fopen(from_filename, "r")) == NULL) return -1;
 
     if ((fd_to = fopen(to_filename, "w")) == NULL) {
         fclose(fd_from);
@@ -408,7 +405,7 @@ time_t get_mtime(const char *path) {
 
 void makeBoxname(char **boxname, char *filename) {
     char *temp;
-    //trim off extension
+    // trim off extension
     char *ext = strrchr(filename, '.');
     if (ext != NULL) *ext = 0;
     if (cfg_stru[c_boxing_path] != NULL) {
@@ -424,7 +421,7 @@ void makeBoxname(char **boxname, char *filename) {
 
 void makeScriptname(char **scriptname, char *filename) {
     char *temp;
-    //trim off extension
+    // trim off extension
     char *ext = strrchr(filename, '.');
     if (ext != NULL) *ext = 0;
     asprintf(scriptname, "%s.h264", filename);
@@ -441,7 +438,8 @@ int get_box_count() {
 void add_box_file(char *boxfile) {
     if ((MAX_BOX_FILES - get_box_count()) > 2) {
         asprintf(&box_files[box_head], "%s", boxfile);
-        printLog("Add %s to Box Queue at pos %d\n", box_files[box_head], box_head);
+        printLog("Add %s to Box Queue at pos %d\n", box_files[box_head],
+                 box_head);
         box_head++;
         if (box_head >= MAX_BOX_FILES) box_head = 0;
     } else {
@@ -454,9 +452,10 @@ int check_box_files() {
     int ret = 0;
     if (v_boxing > 0) {
         makeBoxname(&filename_temp, box_files[box_tail]);
-        // check if current MP4Box finished by seeing if h264 now deleted
+        // Check if current MP4Box finished by seeing if h264 now deleted
         if (access(filename_temp, F_OK) == -1) {
-            printLog("Finished boxing %s from Box Queue at pos %d\n", box_files[box_tail], box_tail);
+            printLog("Finished boxing %s from Box Queue at pos %d\n",
+                     box_files[box_tail], box_tail);
             exec_macro(cfg_stru[c_end_box], box_files[box_tail]);
             free(box_files[box_tail]);
             box_tail++;
@@ -467,11 +466,16 @@ int check_box_files() {
         free(filename_temp);
     }
     if (v_boxing == 0 && get_box_count() > 0) {
-        //start new MP4Box operation
+        // Start new MP4Box operation
         makeBoxname(&filename_temp, box_files[box_tail]);
-        if (cfg_stru[c_MP4Box_cmd] == 0) cfg_stru[c_MP4Box_cmd] = "(set -e;MP4Box -fps %i -add %s %s > /dev/null 2>&1;rm \"%s\";) &";
-        asprintf(&cmd_temp, cfg_stru[c_MP4Box_cmd], cfg_val[c_MP4Box_fps], filename_temp, box_files[box_tail], filename_temp);
-        printLog("Start boxing %s to %s Queue pos %d\n", filename_temp, box_files[box_tail], box_tail);
+        if (cfg_stru[c_MP4Box_cmd] == 0)
+            cfg_stru[c_MP4Box_cmd] =
+                "(set -e;MP4Box -fps %i -add %s %s > /dev/null 2>&1;rm "
+                "\"%s\";) &";
+        asprintf(&cmd_temp, cfg_stru[c_MP4Box_cmd], cfg_val[c_MP4Box_fps],
+                 filename_temp, box_files[box_tail], filename_temp);
+        printLog("Start boxing %s to %s Queue pos %d\n", filename_temp,
+                 box_files[box_tail], box_tail);
         system(cmd_temp);
         v_boxing = 1;
         free(cmd_temp);
@@ -487,20 +491,20 @@ void check_h264_toBox() {
     DIR *dp;
     struct dirent *fp;
     if (get_box_count() == 0) {
-        // get working copy of video path
+        // Get working copy of video path
         makeFilename(&search, cfg_stru[c_video_path]);
-        // find base path from last /
+        // Find base path from last /
         s = strrchr(search, '/');
         printLog("h264 search %s\n", search);
         if (s != NULL) {
-            //truncate off to get base path and open it
+            // Truncate off to get base path and open it
             *s = 0;
             dp = opendir(search);
             if (dp != NULL) {
-                //scan the contents
+                // Scan the contents
                 while ((fp = readdir(dp))) {
                     n = fp->d_name;
-                    // check if file is h264
+                    // Check if file is h264
                     e = n + strlen(n) - 5;
                     if (e > n && strcmp(e, ".h264") == 0) {
                         *(n + strlen(n) - 5) = 0;

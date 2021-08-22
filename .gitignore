@@ -30,3 +30,4 @@ build/
 *.pts
 *.ppm
 *.mkv
+host_applications/linux/apps/raspicam/.vscode/settings.json
