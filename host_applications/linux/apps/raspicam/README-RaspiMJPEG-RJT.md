@@ -1,4 +1,5 @@
-RJTidey Fork
+# RJTidey Fork
+
 Mar 5th 2015
 Raspimjpeg support for separate settings for time-lapse
 Raspimjpeg copy cam.jpg as thumbnails for captures
