@@ -129,32 +129,32 @@ void updateStatus() {
 
     if (cfg_stru[c_status_file] != 0) {
         if (a_error) {
-            snprintf(status, "Error");
+            snprintf(status, sizeof(status), "Error");
         } else if (idle) {
-            snprintf(status, "halted");
+            snprintf(status, sizeof(status), "halted");
         } else if (i_capturing) {
-            snprintf(status, "image");
+            snprintf(status, sizeof(status), "image");
         } else if (v_capturing) {
             if (!cfg_val[c_motion_detection]) {
                 if (timelapse)
-                    snprintf(status, "tl_video");
+                    snprintf(status, sizeof(status), "tl_video");
                 else
-                    snprintf(status, "video");
+                    snprintf(status, sizeof(status), "video");
             } else if (timelapse) {
-                snprintf(status, "tl_md_video");
+                snprintf(status, sizeof(status), "tl_md_video");
             } else {
-                snprintf(status, "md_video");
+                snprintf(status, sizeof(status), "md_video");
             }
         } else {
             if (!cfg_val[c_motion_detection]) {
                 if (timelapse)
-                    snprintf(status, "timelapse");
+                    snprintf(status, sizeof(status), "timelapse");
                 else
-                    snprintf(status, "ready");
+                    snprintf(status, sizeof(status), "ready");
             } else if (timelapse) {
-                snprintf(status, "tl_md_ready");
+                snprintf(status, sizeof(status), "tl_md_ready");
             } else {
-                snprintf(status, "md_ready");
+                snprintf(status, sizeof(status), "md_ready");
             }
         }
 
@@ -186,34 +186,34 @@ int findNextCount(char *folder, char *source) {
     DIR *dp;
     struct dirent *fp;
 
-    // get working copy of a path
+    // Get working copy of a path
     asprintf(&search, "%s", folder);
-    // find base path by searching forward for first %sub then back for /
+    // Find base path by searching forward for first %sub then back for /
     s = strchr(search, '%');
     if (s != NULL) {
         *s = 0;
         s = strrchr(search, '/');
         if (s != NULL) {
-            // truncate off to get base path and open it
+            // Truncate off to get base path and open it
             *s = 0;
             dp = opendir(search);
             if (dp != NULL) {
-                // scan the contents
+                // Scan the contents
                 while ((fp = readdir(dp))) {
                     s = fp->d_name;
-                    // check if name is a thumbnail
+                    // Check if name is a thumbnail
                     e = s + strlen(s) - 7;
                     if (e > s && strcmp(e, ".th.jpg") == 0) {
-                        // truncate where number should end
+                        // Truncate where number should end
                         *e = 0;
-                        // search to find beginning of field
+                        // Search to find beginning of field
                         s = strrchr(s, '.');
                         if (s != NULL) {
-                            // set start to beginning
+                            // Set start to beginning
                             s++;
-                            // see if it a comparison type
+                            // See if it a comparison type
                             if (strchr(source, *s) != NULL) {
-                                // extract number and set maximum
+                                // Extract number and set maximum
                                 found = 1;
                                 current_count = strtoul(s + 1, &e, 10);
                                 if (current_count > max_count) {
@@ -251,16 +251,16 @@ void makeName(char **name, char *template) {
     FILE *fp;
 
     memset(p, 0, sizeof p);
-    // get copy of template to work with
+    // Set copy of template to work with
     asprintf(&template1, "%s", template);
     s = template1;
     if (s != NULL) {
-        // start and end pointers
-        // successively search through template for % specifiers
+        // Start and end pointers
+        // Successively search through template for % specifiers
         while (*s && si < max_subs && strlen(p) < 255) {
             if (*s == '%') {
                 s++;
-                // find which specifier it is or default to unknown
+                // Find which specifier it is or default to unknown
                 f = strchr(spec, *s);
                 if (f == NULL) {
                     sp = strlen(spec);
@@ -270,49 +270,55 @@ void makeName(char **name, char *template) {
                 q = p + strlen(p);
                 switch (sp) {
                     case 0:
-                        snprintf(q, "%s", "%");
+                        snprintf(q, sizeof(q), "%s", "%");
                         break;
                     case 1:
-                        snprintf(q, "%04d", localTime->tm_year + 1900);
+                        snprintf(q, sizeof(q), "%04d",
+                                 localTime->tm_year + 1900);
                         break;
                     case 2:
-                        snprintf(q, "%02d", (localTime->tm_year + 1900) % 100);
+                        snprintf(q, sizeof(q), "%02d",
+                                 (localTime->tm_year + 1900) % 100);
                         break;
                     case 3:
-                        snprintf(q, "%02d", localTime->tm_mon + 1);
+                        snprintf(q, sizeof(q), "%02d", localTime->tm_mon + 1);
                         break;
                     case 4:
-                        snprintf(q, "%02d", localTime->tm_mday);
+                        snprintf(q, sizeof(q), "%02d", localTime->tm_mday);
                         break;
                     case 5:
-                        snprintf(q, "%02d", localTime->tm_hour);
+                        snprintf(q, sizeof(q), "%02d", localTime->tm_hour);
                         break;
                     case 6:
-                        snprintf(q, "%02d", localTime->tm_min);
+                        snprintf(q, sizeof(q), "%02d", localTime->tm_min);
                         break;
                     case 7:
-                        snprintf(q, "%02d", localTime->tm_sec);
+                        snprintf(q, sizeof(q), "%02d", localTime->tm_sec);
                         break;
                     case 8:
-                        snprintf(q, "%03d", currTime.tv_nsec / 1000000);
+                        snprintf(q, sizeof(q), "%03d",
+                                 currTime.tv_nsec / 1000000);
                         break;
                     case 9:
-                        snprintf(q, cfg_stru[c_count_format], video_cnt);
+                        snprintf(q, sizeof(q), cfg_stru[c_count_format],
+                                 video_cnt);
                         break;
                     case 10:
-                        snprintf(q, cfg_stru[c_count_format], image2_cnt);
+                        snprintf(q, sizeof(q), cfg_stru[c_count_format],
+                                 image2_cnt);
                         break;
                     case 11:
-                        snprintf(q, cfg_stru[c_count_format], lapse_cnt);
+                        snprintf(q, sizeof(q), cfg_stru[c_count_format],
+                                 lapse_cnt);
                         break;
                     case 12:
-                        snprintf(q, "%04d", motion_frame_count);
+                        snprintf(q, sizeof(q), "%04d", motion_frame_count);
                         break;
                     case 13:
-                        snprintf(q, "%04d", motion_changes);
+                        snprintf(q, sizeof(q), "%04d", motion_changes);
                         break;
                     case 14:
-                        snprintf(q, "%02d", video_frame);
+                        snprintf(q, sizeof(q), "%02u", video_frame);
                         break;
                     case 15:
                         if (cfg_stru[c_user_annotate] != NULL) {

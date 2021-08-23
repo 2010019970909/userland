@@ -418,9 +418,11 @@ int main(int argc, char *argv[]) {
     }
     for (i = 0; i < FIFO_MAX; i++) {
         if (i == 0) {
-            snprintf(fdName[i], "%s", cfg_stru[c_control_file]);
+            snprintf(fdName[i], sizeof(fdName[i]), "%s",
+                     cfg_stru[c_control_file]);
         } else {
-            snprintf(fdName[i], "%s%d", cfg_stru[c_control_file], i + 10);
+            snprintf(fdName[i], sizeof(fdName[i]), "%s%d",
+                     cfg_stru[c_control_file], i + 10);
         }
     }
 

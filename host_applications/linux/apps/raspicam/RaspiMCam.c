@@ -226,7 +226,8 @@ static void h264encoder_buffer_callback(MMAL_PORT_T *port,
 
         if (buffer->flags & MMAL_BUFFER_HEADER_FLAG_CONFIG) {
             if (header_wptr + buffer->length > sizeof(header_bytes)) {
-                printLog("DEBUG 1: %i, %i\n", header_wptr, (int)buffer->length);  // NOLINT
+                printLog("DEBUG 1: %i, %i\n", header_wptr,
+                         (int)buffer->length);  // NOLINT
                 error("Error in header bytes\n", 0);
             } else {
                 mmal_buffer_header_mem_lock(buffer);
@@ -337,7 +338,8 @@ void cam_set_annotationV3(char *filename_temp, MMAL_BOOL_T enable) {
     MMAL_PARAMETER_CAMERA_ANNOTATE_V3_T anno = {
         {MMAL_PARAMETER_ANNOTATE, sizeof(MMAL_PARAMETER_CAMERA_ANNOTATE_V3_T)}};
 
-    if (filename_temp != 0) snprintf(anno.text, filename_temp);
+    if (filename_temp != 0)
+        snprintf(anno.text, sizeof(anno.text), filename_temp);
     anno.enable = enable;
     anno.show_shutter = 0;
     anno.show_analog_gain = 0;

@@ -129,7 +129,7 @@ void process_cmd(char *readbuf, int length) {
     pipe_cmd = (pipe_cmd_type)((temp - pipe_cmds) / 3);
 
     if (length > 3) {
-        snprintf(par, readbuf + 3);
+        snprintf(par, sizeof(par), readbuf + 3);
         par[length - 3] = 0;
         // Extract space separated numeric parameters
         // and make separate string parameter (strtok changes the original)
@@ -137,7 +137,7 @@ void process_cmd(char *readbuf, int length) {
         parcount = 0;
         temp = strtok_r(par, " ");
         while (parcount < 10 && temp != NULL) {
-            snprintf(pars[parcount], temp);
+            snprintf(pars[parcount], sizeof(pars[parcount]), temp);
             parcount++;
             temp = strtok_r(NULL, " ");
         }
