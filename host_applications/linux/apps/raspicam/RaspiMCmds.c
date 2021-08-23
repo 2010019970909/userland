@@ -135,11 +135,13 @@ void process_cmd(char *readbuf, int length) {
         // and make separate string parameter (strtok changes the original)
         asprintf(&parstring, "%s", par);
         parcount = 0;
-        temp = strtok_r(par, " ");
+        static char *save_strtok_r;
+        temp = strtok_r(par, " ", &save_strtok_r);
         while (parcount < 10 && temp != NULL) {
             snprintf(pars[parcount], sizeof(pars[parcount]), temp);
             parcount++;
-            temp = strtok_r(NULL, " ");
+            static char *save_strtok_r;
+            temp = strtok_r(NULL, " ", &save_strtok_r);
         }
         par0 = strtol(pars[0], NULL, 10);
     } else {
