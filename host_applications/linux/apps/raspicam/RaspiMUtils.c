@@ -270,53 +270,53 @@ void makeName(char **name, char *template) {
                 q = p + strlen(p);
                 switch (sp) {
                     case 0:  // %
-                        snprintf(q, 2, "%s", "%");
+                        snprintf(q, 2, "%s", "%");  // NOLINT
                         break;
                     case 1:  // YYYY (year)
-                        snprintf(q, 12, "%04d", localTime->tm_year + 1900);
+                        snprintf(q, 12, "%04d", localTime->tm_year + 1900);  // NOLINT
                         break;
                     case 2:  // yy (year)
-                        snprintf(q, 4, "%02d",
+                        snprintf(q, 4, "%02d",  // NOLINT
                                  (localTime->tm_year + 1900) % 100);
                         break;
                     case 3:  // MM (month)
-                        snprintf(q, 12, "%02d", localTime->tm_mon + 1);
+                        snprintf(q, 12, "%02d", localTime->tm_mon + 1);  // NOLINT
                         break;
                     case 4:  // DD (day)
-                        snprintf(q, 3, "%02d", localTime->tm_mday);
+                        snprintf(q, 3, "%02d", localTime->tm_mday);  // NOLINT
                         break;
                     case 5:  // hh (hour)
-                        snprintf(q, 3, "%02d", localTime->tm_hour);
+                        snprintf(q, 3, "%02d", localTime->tm_hour);  // NOLINT
                         break;
                     case 6:  // mm (minute)
-                        snprintf(q, 3, "%02d", localTime->tm_min);
+                        snprintf(q, 3, "%02d", localTime->tm_min);  // NOLINT
                         break;
                     case 7:  // ss (second)
-                        snprintf(q, 3, "%02d", localTime->tm_sec);
+                        snprintf(q, 3, "%02d", localTime->tm_sec);  // NOLINT
                         break;
                     case 8:  // u
-                        snprintf(q, 6, "%03ld", currTime.tv_nsec / 1000000);
+                        snprintf(q, 6, "%03ld", currTime.tv_nsec / 1000000);  // NOLINT
                         break;
                     case 9:  // v
-                        snprintf(q, 12, cfg_stru[c_count_format],
+                        snprintf(q, 12, cfg_stru[c_count_format],  // NOLINT
                                  video_cnt);
                         break;
                     case 10:  // i
-                        snprintf(q, 12, cfg_stru[c_count_format],
+                        snprintf(q, 12, cfg_stru[c_count_format],  // NOLINT
                                  image2_cnt);
                         break;
                     case 11:  // t
-                        snprintf(q, 12, cfg_stru[c_count_format],
+                        snprintf(q, 12, cfg_stru[c_count_format],  // NOLINT
                                  lapse_cnt);
                         break;
                     case 12:  // f
-                        snprintf(q, 5, "%04d", motion_frame_count);
+                        snprintf(q, 5, "%04d", motion_frame_count);  // NOLINT
                         break;
                     case 13:  // c
-                        snprintf(q, 5, "%04d", motion_changes);
+                        snprintf(q, 5, "%04d", motion_changes);  // NOLINT
                         break;
                     case 14:  // k
-                        snprintf(q, 3, "%02u", video_frame);
+                        snprintf(q, 3, "%02u", video_frame);  // NOLINT
                         break;
                     case 15:  // a
                         if (cfg_stru[c_user_annotate] != NULL) {
