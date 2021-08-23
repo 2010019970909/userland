@@ -123,7 +123,7 @@ void process_cmd(char *readbuf, int length) {
     // Find 2 letters command and translate into enum
     temp = strstr(pipe_cmds, cmd);
     if (temp == NULL) {
-        printf("cmd not found in\n", cmd);
+        printf("cmd (%s) not found in\n", cmd);
         return;
     }
     pipe_cmd = (pipe_cmd_type)((temp - pipe_cmds) / 3);

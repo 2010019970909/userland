@@ -269,58 +269,56 @@ void makeName(char **name, char *template) {
                 }
                 q = p + strlen(p);
                 switch (sp) {
-                    case 0:
-                        snprintf(q, sizeof(q), "%s", "%");
+                    case 0:  // %
+                        snprintf(q, 2, "%s", "%");
                         break;
-                    case 1:
-                        snprintf(q, sizeof(q), "%04d",
-                                 localTime->tm_year + 1900);
+                    case 1:  // YYYY (year)
+                        snprintf(q, 12, "%04d", localTime->tm_year + 1900);
                         break;
-                    case 2:
-                        snprintf(q, sizeof(q), "%02d",
+                    case 2:  // yy (year)
+                        snprintf(q, 4, "%02d",
                                  (localTime->tm_year + 1900) % 100);
                         break;
-                    case 3:
-                        snprintf(q, sizeof(q), "%02d", localTime->tm_mon + 1);
+                    case 3:  // MM (month)
+                        snprintf(q, 12, "%02d", localTime->tm_mon + 1);
                         break;
-                    case 4:
-                        snprintf(q, sizeof(q), "%02d", localTime->tm_mday);
+                    case 4:  // DD (day)
+                        snprintf(q, 3, "%02d", localTime->tm_mday);
                         break;
-                    case 5:
-                        snprintf(q, sizeof(q), "%02d", localTime->tm_hour);
+                    case 5:  // hh (hour)
+                        snprintf(q, 3, "%02d", localTime->tm_hour);
                         break;
-                    case 6:
-                        snprintf(q, sizeof(q), "%02d", localTime->tm_min);
+                    case 6:  // mm (minute)
+                        snprintf(q, 3, "%02d", localTime->tm_min);
                         break;
-                    case 7:
-                        snprintf(q, sizeof(q), "%02d", localTime->tm_sec);
+                    case 7:  // ss (second)
+                        snprintf(q, 3, "%02d", localTime->tm_sec);
                         break;
-                    case 8:
-                        snprintf(q, sizeof(q), "%03d",
-                                 currTime.tv_nsec / 1000000);
+                    case 8:  // u
+                        snprintf(q, 6, "%03ld", currTime.tv_nsec / 1000000);
                         break;
-                    case 9:
-                        snprintf(q, sizeof(q), cfg_stru[c_count_format],
+                    case 9:  // v
+                        snprintf(q, 12, cfg_stru[c_count_format],
                                  video_cnt);
                         break;
-                    case 10:
-                        snprintf(q, sizeof(q), cfg_stru[c_count_format],
+                    case 10:  // i
+                        snprintf(q, 12, cfg_stru[c_count_format],
                                  image2_cnt);
                         break;
-                    case 11:
-                        snprintf(q, sizeof(q), cfg_stru[c_count_format],
+                    case 11:  // t
+                        snprintf(q, 12, cfg_stru[c_count_format],
                                  lapse_cnt);
                         break;
-                    case 12:
-                        snprintf(q, sizeof(q), "%04d", motion_frame_count);
+                    case 12:  // f
+                        snprintf(q, 5, "%04d", motion_frame_count);
                         break;
-                    case 13:
-                        snprintf(q, sizeof(q), "%04d", motion_changes);
+                    case 13:  // c
+                        snprintf(q, 5, "%04d", motion_changes);
                         break;
-                    case 14:
-                        snprintf(q, sizeof(q), "%02u", video_frame);
+                    case 14:  // k
+                        snprintf(q, 3, "%02u", video_frame);
                         break;
-                    case 15:
+                    case 15:  // a
                         if (cfg_stru[c_user_annotate] != NULL) {
                             fp = fopen(cfg_stru[c_user_annotate], "r");
                             if (fp != NULL) {
@@ -431,7 +429,7 @@ void makeBoxname(char **boxname, char *filename) {
 }
 
 void makeScriptname(char **scriptname, char *filename) {
-    char *temp;
+    // char *temp;
     // trim off extension
     char *ext = strrchr(filename, '.');
     if (ext != NULL) *ext = 0;

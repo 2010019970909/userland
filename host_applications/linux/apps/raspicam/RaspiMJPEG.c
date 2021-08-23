@@ -312,6 +312,8 @@ void read_config(char *cfilename, int type) {
 void checkPipe(int pipe) {
     char *lf;
     int length, hPipe;
+    length = 0;
+
     hPipe = fd[pipe];
     if (hPipe >= 0) {
         length = read(hPipe, readbuf[pipe] + readi[pipe], MAX_COMMAND_LEN - 2);
@@ -436,6 +438,7 @@ int main(int argc, char *argv[]) {
                 close(fd[i]);
             } else {
                 if (i == 0) error("Could not open main PIPE", 1);
+                length = 0;
             }
         } while (fd[i] >= 0 && length != 0);
     }
@@ -549,7 +552,7 @@ int main(int argc, char *argv[]) {
         usleep(cfg_val[c_fifo_interval]);
     }
 
-    close(fd);
+    close(fd);  // Raise a warning?
     if (system("killall motion 2> /dev/null") == -1)
         error("Could not stop external motion", 1);
 

@@ -44,8 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include "bcm_host.h"  // NOLINT
 #include "interface/mmal/mmal.h"
